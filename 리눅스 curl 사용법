@@ -1,0 +1,54 @@
+리눅스에서 api 를 사용하는 방법 중 curl 이 있다
+-X 옵션을 통해 post get 등의 api를 사용할 수 있는데 이에대해 알아보자
+
+
+curl -X GET "주소" -H ""
+curl -X POST
+
+
+주요 옵션
+
+-k	--insecure	https 사이트를 SSL certificate 검증없이 연결한다.	wget 의 --no-check-certificate 과 비슷한 역할 수행
+-l	--head	HTTP header 만 보여주고 content 는 표시하지 않는다	
+-D	--dump-header <file>	<file> 에 HTTP header 를 기록한다.	
+-d	--data	HTTP Post data	FORM 을 POST 하는 HTTP나 JSON 으로 데이타를 주고받는 REST 기반의 웹서비스 디버깅시 유용한 옵션이다
+-v	--verbose 	동작하면서 자세한 옵션을 출력한다.	
+-J	--remote-header-name	어떤 웹서비스는 파일 다운로드시 Content-Disposition Header 를 파싱해야 정확한 파일이름을 알 수 있을 경우가 있다. -J 옵션을 주면 헤더에 있는 파일 이름으로 저장한다.	curl 7.20 이상부터 추가된 옵션
+-o	--output FILE	curl 은 remote 에서 받아온 데이타를 기본적으로는 콘솔에 출력한다. -o 옵션 뒤에 FILE 을 적어주면 해당 FILE 로 저장한다. (download 시 유용)	
+-O	--remote-name	file 저장시 remote 의 file 이름으로 저장한다. -o 옵션보다 편리하다.	
+-s	--silent	정숙 모드. 진행 내역이나 메시지등을 출력하지 않는다. -o 옵션으로 remote data 도 /dev/null 로 보내면 결과물도 출력되지 않는다	HTTP response code 만 가져오거나 할 경우 유리
+-X	--request	Request 시 사용할 method 종류(GET, POST, PUT, PATCH, DELETE) 를 기술한다.
+curl 은 POST 시 데이타를 text 로 취급하므로 binary 데이타는 깨질 수 있다. 제대로 전송하려면 --data-binary 옵션을 추가해야 한다.
+Remote 에 있는 Resource 의 전체를 교체하는 PUT 과는 달리 일부 항목만 교체할 때 사용하는 메서드로 -X PATCH 옵션을 추가해서 URL 호출.
+Remote 에 있는 Resource 를 삭제할 때 주로 사용하며 보안 문제가 있으므로 서버는 권한있는 사용자의 호출인지 여부를 확인하고 처리해야 함.
+client 는 -X DELETE 옵션을 추가해서 URL 호출.
+
+
+-i 옵션을 사용하면 서버의 응답에 서버가 보낸 HTTP 헤더를 추가하여 출력한다. 디버깅에 유용한다.
+-u id/pwd 가 필요한 사이트의 경우 -u(–user) 옵션 뒤에 userid:password 를 지정하여 인증할 수 있다.
+-H -header OAuth 나 JWT 등에 사용하는 Bearer token 을 사용하려면 -H 옵션뒤에  'Authorization: Bearer {TOKEN}' 를 추가하며 {TOKEN} 은 실제 토큰으로 변경하면 된다.
+-T --upload-file 옵션을 사용하면 서버에 파일을 전송할 수 있음. 아래는 a.pdf 를 서버에 전송하는 예제
+-A --user-agent 특정 브라우저인(Browser) 것처럼 동작하기 위해서는 -A ( --user-agent) 옵션을 사용할 수 있다.
+-e --referer Referer 를 체크하는 사이트일 경우 -e (–referer) 옵션으로 Referer URL 을 설정할 수 있다.
+아니면 -H 옵션으로 referer 헤더를 지정해도 된다.
+-c --cookie-jar 파일로 저장할 경우 -c, --cookie-jar 옵션뒤에 쿠키를 저장할 파일명을 적어줌.
+-b --cookie 옵션을 사용하면 쿠키를 저장한 파일에서 읽거나 또는 직접 쿠키 값을 설정하여 HTTP 요청할 수 있음
+-j --junk-session-cookies -b 옵션과 함께  -j, --junk-session-cookies 옵션을 사용하면 쿠키를 저장한 파일에서 세션 정보만 읽지 않으므로 새로 세션 쿠키를 생성할 수 있음.
+
+
+
+-L	--location	서버에서 HTTP 301 이나 HTTP 302 응답이 왔을 경우 redirection URL 로 따라간다.
+--max-redirs 뒤에 숫자로 redirection 을 몇 번 따라갈지 지정할 수 있다. 기본 값은 50이다
+
+curl -v daum.net 을 실행하면 결과값으로 다음과 같이 HTTP 302 가 리턴된다.
+
+< HTTP/1.1 302 Object Moved
+< Location: http://www.daum.net/
+
+-L 옵션을 추가하면 www.daum.net 으로 재접속하여 결과를 받아오게 된다.
+
+
+
+
+
+
